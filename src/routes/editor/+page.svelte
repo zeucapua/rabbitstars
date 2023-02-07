@@ -10,10 +10,20 @@
   // Trace component variables
   let step = 0;
   let highlights : number[][] = [[]];
+  let playing = false;
+  let playInterval : ReturnType<typeof setInterval>;
   
   // for preview
   function increment() { if (step < highlights.length - 1) { step += 1; } } 
   function decrement() { if (step != 0) { step -= 1; } }
+  function togglePlaying() { playing = !playing; }
+  function autoplay() {
+    if (step < highlights.length - 1) { increment(); }
+    else {
+      togglePlaying();
+      step = 0;
+    }
+  }
   
   // for editor
   function editorIncrement() { 
@@ -47,6 +57,10 @@
 
   $: lines = content.split("\n");
   $: highlights[editor_step] = editor_highlighted;
+  $: {
+    if (playing) { playInterval = setInterval(autoplay, 1000); }
+    else { clearInterval(playInterval); }
+  }
 </script>
 
 <main class="flex flex-row gap-8 w-screen h-screen p-16 bg-base">
@@ -86,6 +100,13 @@
     <div class="flex flex-row justify-between w-full h-fit px-8 py-4">
       <div class="flex flex-row gap-8">
         <p class="text-xl text-text font-bold">Preview</p>
+        <button on:click={togglePlaying} class="text-text">
+          {#if playing}
+            <Icon name="pause" size={24} />
+          {:else}
+            <Icon name="play" size={24} />
+          {/if}
+        </button>
         <button on:click={decrement} class="text-md text-text">
           <Icon name="arrow-small-left" size={24} />
         </button>
@@ -97,7 +118,7 @@
         {step + 1}/{highlights.length}
       </p>
     </div>
-    <div class="w-full h-fit">
+    <div class="w-full h-fit border-text border-2 rounded-md">
       <Trace {step} {highlights}>
       
         {#each lines as line}

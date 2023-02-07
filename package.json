@@ -25,6 +25,6 @@
 	"type": "module",
 	"dependencies": {
 		"svelte-icomoon": "^0.4.4",
-		"trace-svelte": "^0.0.2"
+		"trace-svelte": "^0.0.3"
 	}
 }
